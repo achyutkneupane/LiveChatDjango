@@ -1,0 +1,30 @@
+# Django #
+*.log
+*.pot
+*.pyc
+__pycache__
+db.sqlite3
+media
+
+# Backup files #
+*.bak
+
+# DB #
+*.sqlite3
+
+# If you are using PyCharm #
+# User-specific stuff
+.idea/**
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# DS_Store files #
+.DS_Store
+**/.DS_Store
