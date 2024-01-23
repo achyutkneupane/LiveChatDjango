@@ -21,3 +21,19 @@ class User(models.Model):
         ordering = ["-createdAt"]
         verbose_name = "User"
         verbose_name_plural = "Users"
+
+
+class Login(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    userAgent = models.CharField(max_length=50)
+    ipAddress = models.CharField(max_length=50)
+    createdAt = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.user.username + " logged in at " + str(self.createdAt)
+
+    class Meta:
+        db_table = "logins"
+        ordering = ["-createdAt"]
+        verbose_name = "Login"
+        verbose_name_plural = "Logins"
