@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from .permissions import is_guest, logged_in
-from .serializers import UserSerializer, LoginSerializer
+from .serializers import UserSerializer, UserLoginSerializer
 
 
 @api_view(['GET'])
@@ -21,3 +21,16 @@ def register(request):
         return Response({'message': 'Invalid Data'}, 400)
     serializer.save()
     return Response({'message': 'User Registered Successfully'}, 200)
+
+
+@api_view(['POST'])
+def login(request):
+    if logged_in(request):
+        return Response({'message': 'You are already logged in'}, 400)
+
+    serializer = UserLoginSerializer(data=request.data)
+    if not serializer.is_valid(raise_exception=True):
+        return Response({'message': 'Invalid Data'}, 400)
+
+    serializer.save()
+    return Response({'message': 'Login Successful'}, 200)
