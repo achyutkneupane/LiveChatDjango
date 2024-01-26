@@ -12,4 +12,3 @@ This is a simple API for a live chat application. It is built using Django.
 - Django
 - Django Rest Framework
 - MySQL
-- Channels
