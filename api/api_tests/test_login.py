@@ -55,3 +55,16 @@ class RegistrationTestCase(TestCase):
         response = self.client.post('/api/auth/login', new_login_data, format='json')
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data['login'], ['User with this username does not exist'])
+
+    def test_user_cannot_login_with_invalid_password(self):
+        new_login_data = self.login_data.copy()
+        new_login_data['password'] = 'invalidpassword'
+
+        response = self.client.post('/api/auth/register', self.test_data, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(User.objects.count(), 1)
+        self.assertEqual(response.data['message'], 'User Registered Successfully')
+
+        response = self.client.post('/api/auth/login', new_login_data, format='json')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data['password'], ['Invalid password'])
