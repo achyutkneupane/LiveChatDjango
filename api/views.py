@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from .permissions import is_guest, logged_in
-from .serializers import UserSerializer, UserLoginSerializer
+from .serializers import UserSerializer, UserLoginSerializer, LoginSerializer
 
 
 @api_view(['GET'])
@@ -32,5 +32,16 @@ def login(request):
     if not serializer.is_valid(raise_exception=True):
         return Response({'message': 'Invalid Data'}, 400)
 
-    serializer.save()
-    return Response({'message': 'Login Successful'}, 200)
+    login_serializer_data = {
+        'user': serializer.validated_data.id,
+        'userAgent': request.META.get('HTTP_USER_AGENT', 'Unknown User Agent'),
+        'ipAddress': request.META.get('REMOTE_ADDR', 'Unknown IP Address')
+    }
+
+    login_serializer = LoginSerializer(data=login_serializer_data)
+
+    if not login_serializer.is_valid(raise_exception=True):
+        return Response({'message': 'Invalid Data'}, 400)
+
+    login_serializer.save()
+    return Response({'message': 'User Logged In Successfully'}, 200)

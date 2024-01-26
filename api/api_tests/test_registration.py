@@ -19,7 +19,7 @@ class RegistrationTestCase(TestCase):
         }
 
     def test_user_registration_success(self):
-        response = self.client.post('/api/register', self.test_data, format='json')
+        response = self.client.post('/api/auth/register', self.test_data, format='json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 1)
         for key, value in self.test_data.items():
@@ -32,18 +32,18 @@ class RegistrationTestCase(TestCase):
     def test_user_registration_failure(self):
         test_data_copy = self.test_data.copy()
         test_data_copy["email"] = "invalidemail"
-        response = self.client.post('/api/register', test_data_copy, format='json')
+        response = self.client.post('/api/auth/register', test_data_copy, format='json')
         self.assertEqual(response.status_code, 400)
         self.assertEqual(User.objects.count(), 0)
         self.assertEqual(response.data['email'], ['Enter a valid email address.'])
 
     def test_user_registration_duplicate(self):
-        response = self.client.post('/api/register', self.test_data, format='json')
+        response = self.client.post('/api/auth/register', self.test_data, format='json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 1)
         self.assertEqual(response.data['message'], 'User Registered Successfully')
 
-        response = self.client.post('/api/register', self.test_data, format='json')
+        response = self.client.post('/api/auth/register', self.test_data, format='json')
         self.assertEqual(response.status_code, 400)
         self.assertEqual(User.objects.count(), 1)
         self.assertEqual(response.data["username"], ["User with this username already exists."])
@@ -56,7 +56,7 @@ class RegistrationTestCase(TestCase):
         test_data_copy["email"] = ""
         test_data_copy["username"] = ""
         test_data_copy["password"] = ""
-        response = self.client.post('/api/register', test_data_copy, format='json')
+        response = self.client.post('/api/auth/register', test_data_copy, format='json')
         self.assertEqual(response.status_code, 400)
         self.assertEqual(User.objects.count(), 0)
         self.assertEqual(response.data["firstName"], ["This field may not be blank."])
@@ -72,7 +72,7 @@ class RegistrationTestCase(TestCase):
         del test_data_copy["email"]
         del test_data_copy["username"]
         del test_data_copy["password"]
-        response = self.client.post('/api/register', test_data_copy, format='json')
+        response = self.client.post('/api/auth/register', test_data_copy, format='json')
         self.assertEqual(response.status_code, 400)
         self.assertEqual(User.objects.count(), 0)
         self.assertEqual(response.data["firstName"], ["This field is required."])

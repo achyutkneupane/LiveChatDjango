@@ -32,7 +32,6 @@ class UserLoginSerializer(serializers.Serializer):
     password = serializers.CharField()
 
     def validate(self, data):
-        print(data.items())
         login = data.get('login')
         password = data.get('password')
 
@@ -53,4 +52,4 @@ class UserLoginSerializer(serializers.Serializer):
         if not bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
             raise serializers.ValidationError({'password': 'Invalid password'})
 
-        return data
+        return user
