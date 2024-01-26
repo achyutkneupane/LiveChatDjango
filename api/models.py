@@ -1,6 +1,5 @@
 from django.db import models
 
-
 class User(models.Model):
     firstName = models.CharField(max_length=50)
     middleName = models.CharField(max_length=50, blank=True)
@@ -21,6 +20,7 @@ class User(models.Model):
         ordering = ["-createdAt"]
         verbose_name = "User"
         verbose_name_plural = "Users"
+        app_label = "api"
 
 
 class Login(models.Model):
@@ -37,3 +37,4 @@ class Login(models.Model):
         ordering = ["-createdAt"]
         verbose_name = "Login"
         verbose_name_plural = "Logins"
+        app_label = "api"
