@@ -68,3 +68,47 @@ class RegistrationTestCase(TestCase):
         response = self.client.post('/api/auth/login', new_login_data, format='json')
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data['password'], ['Invalid password'])
+
+    def test_user_cannot_login_with_blank_values(self):
+        new_login_data = self.login_data.copy()
+        new_login_data['login'] = ''
+        new_login_data['password'] = ''
+
+        response = self.client.post('/api/auth/register', self.test_data, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(User.objects.count(), 1)
+        self.assertEqual(response.data['message'], 'User Registered Successfully')
+
+        response = self.client.post('/api/auth/login', new_login_data, format='json')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data['login'], ['This field may not be blank.'])
+        self.assertEqual(response.data['password'], ['This field may not be blank.'])
+
+    def test_user_cannot_login_with_missing_values(self):
+        new_login_data = self.login_data.copy()
+        del new_login_data['login']
+        del new_login_data['password']
+
+        response = self.client.post('/api/auth/register', self.test_data, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(User.objects.count(), 1)
+        self.assertEqual(response.data['message'], 'User Registered Successfully')
+
+        response = self.client.post('/api/auth/login', new_login_data, format='json')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data['login'], ['This field is required.'])
+        self.assertEqual(response.data['password'], ['This field is required.'])
+
+    def test_user_cannot_login_with_invalid_login_and_password(self):
+        new_login_data = self.login_data.copy()
+        new_login_data['login'] = 'invalidlogin'
+        new_login_data['password'] = 'invalidpassword'
+
+        response = self.client.post('/api/auth/register', self.test_data, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(User.objects.count(), 1)
+        self.assertEqual(response.data['message'], 'User Registered Successfully')
+
+        response = self.client.post('/api/auth/login', new_login_data, format='json')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data['login'], ['User with this username does not exist'])
