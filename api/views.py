@@ -12,7 +12,7 @@ def index(request):
 @api_view(['POST'])
 def register(request):
     serializer = UserSerializer(data=request.data)
-    if not serializer.is_valid():
+    if not serializer.is_valid(raise_exception=True):
         return Response({'message': 'Invalid Data'}, 400)
     serializer.save()
     return Response({'message': 'User Registered Successfully'}, 200)
