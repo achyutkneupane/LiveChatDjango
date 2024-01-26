@@ -1,6 +1,7 @@
 from django.test import TestCase
 from rest_framework.test import APIClient
 from api.models import User
+import bcrypt
 
 
 class RegistrationTestCase(TestCase):
@@ -23,7 +24,10 @@ class RegistrationTestCase(TestCase):
         self.assertEqual(User.objects.count(), 1)
         for key, value in self.test_data.items():
             user = User.objects.get()
-            self.assertEqual(getattr(user, key), value)
+            if key == "password":
+                self.assertTrue(bcrypt.checkpw(value.encode('utf-8'), user.password.encode('utf-8')))
+            else:
+                self.assertEqual(getattr(user, key), value)
 
     def test_user_registration_failure(self):
         test_data_copy = self.test_data.copy()
