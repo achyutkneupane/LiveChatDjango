@@ -75,27 +75,6 @@ WSGI_APPLICATION = "LiveChat.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": BASE_DIR / "db.sqlite3",
-#     }
-# }
-
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.mysql",
-#         "NAME": "django_livechat",
-#         "USER": "root",
-#         "PASSWORD": "",
-#         "HOST": "localhost",
-#         "PORT": "3306",
-#     }
-# }
-
-# env based database settings
-
-# if test, use sqlite3
 if os.getenv('DJANGO_ENV') == 'test':
     DATABASES = {
         "default": {
