@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from .models import User, Login
+from .utils import required_validators
 import bcrypt
+import re
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -22,3 +24,32 @@ class LoginSerializer(serializers.ModelSerializer):
     class Meta:
         model = Login
         fields = '__all__'
+
+
+class UserLoginSerializer(serializers.Serializer):
+
+    login = serializers.CharField()
+    password = serializers.CharField()
+
+    def validate(self, data):
+        login = data.get('login')
+        password = data.get('password')
+
+        required_validators(login=login, password=password)
+
+        email_regex = re.compile(r'[^@]+@[^@]+\.[^@]+')
+
+        if email_regex.match(login):
+            default_login = "email"
+        else:
+            default_login = "username"
+
+        user = User.objects.filter(**{default_login: login}).first()
+
+        if not user:
+            raise serializers.ValidationError({'login': f'User with this {default_login} does not exist'})
+
+        if not bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
+            raise serializers.ValidationError({'password': 'Invalid password'})
+
+        return user
