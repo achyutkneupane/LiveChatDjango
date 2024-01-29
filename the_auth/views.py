@@ -1,15 +1,12 @@
 from drf_yasg import openapi
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
 
-from .models import User
-from .permissions import is_guest, logged_in
+from .permissions import logged_in
 from .serializers import UserSerializer, UserLoginSerializer, LoginSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from drf_yasg.utils import swagger_auto_schema
-from .responses import login_response, permission_response, register_response
+from LiveChat.responses import login_response, error_response, register_response
 
 
 class TheAuthAPIView(ViewSet):
@@ -26,7 +23,7 @@ class TheAuthAPIView(ViewSet):
                 'status': 200
             }
         }),
-        400: permission_response[400]
+        400: error_response[400]
     })
     def index(self, request):
         if not logged_in(request):

@@ -1,6 +1,6 @@
 from drf_yasg import openapi
 
-permission_response = {
+error_response = {
     400: openapi.Response('Invalid Data', openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties={
@@ -36,7 +36,7 @@ login_response = {
             'status': 200
         }
     }),
-    400: permission_response[400]
+    400: error_response[400]
 }
 
 register_response = {
@@ -52,5 +52,5 @@ register_response = {
             'status': 200
         }
     }),
-    400: permission_response[400]
+    400: error_response[400]
 }
