@@ -21,7 +21,7 @@ class User(models.Model):
         ordering = ["-createdAt"]
         verbose_name = "User"
         verbose_name_plural = "Users"
-        app_label = "api"
+        app_label = "the_auth"
 
 
 class Login(models.Model):
@@ -38,4 +38,4 @@ class Login(models.Model):
         ordering = ["-createdAt"]
         verbose_name = "Login"
         verbose_name_plural = "Logins"
-        app_label = "api"
+        app_label = "the_auth"
