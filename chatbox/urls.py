@@ -1,5 +1,7 @@
 from django.urls import path
 
+from chatbox.views import ChatboxView
+
 urlpatterns = [
-    path('', views.index, name='index'),
+    path('', ChatboxView.as_view({'get': 'index'}), name='chatbox'),
 ]
