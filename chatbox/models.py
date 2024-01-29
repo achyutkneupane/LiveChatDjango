@@ -1,4 +1,5 @@
 from django.db import models
+from drf_yasg import openapi
 
 
 class Chatbox(models.Model):
@@ -10,6 +11,22 @@ class Chatbox(models.Model):
 
     def __str__(self):
         return self.name
+
+    @classmethod
+    def schema(cls):
+        return openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'id': openapi.Schema(type=openapi.TYPE_INTEGER),
+                'name': openapi.Schema(type=openapi.TYPE_STRING),
+                'participants': openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Schema(type=openapi.TYPE_INTEGER)
+                ),
+                'createdAt': openapi.Schema(type=openapi.TYPE_STRING),
+                'updatedAt': openapi.Schema(type=openapi.TYPE_STRING)
+            }
+        )
 
     class Meta:
         db_table = "chatboxes"
