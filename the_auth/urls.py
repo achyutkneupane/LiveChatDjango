@@ -1,7 +1,8 @@
 from django.urls import path
-from . import views
+from .views import TheAuthAPIView, TheAuthRegisterView, TheAuthLoginView
 
 urlpatterns = [
-    path('register', views.register, name='register'),
-    path('login', views.login, name='login')
+    # path('', TheAuthAPIView.as_view({'get': 'index'}), name='auth'),
+    path('register', TheAuthRegisterView.as_view({'post': 'register'}), name='auth.register'),
+    path('login', TheAuthLoginView.as_view({'post': 'login'}), name='auth.login')
 ]
