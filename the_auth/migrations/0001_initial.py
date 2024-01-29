@@ -56,7 +56,7 @@ class Migration(migrations.Migration):
                 (
                     "user",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="api.user"
+                        on_delete=django.db.models.deletion.CASCADE, to="the_auth.user"
                     ),
                 ),
             ],
