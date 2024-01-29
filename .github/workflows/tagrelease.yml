@@ -31,8 +31,11 @@ jobs:
           python manage.py test
 
   build:
+    name: Build and push release
     runs-on: ubuntu-latest
     needs: test
+    permissions:
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
