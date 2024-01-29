@@ -26,7 +26,7 @@ class User(models.Model):
 
 class Login(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    userAgent = models.CharField(max_length=50)
+    userAgent = models.CharField(max_length=255)
     ipAddress = models.CharField(max_length=50)
     createdAt = models.DateTimeField(auto_now_add=True)
 

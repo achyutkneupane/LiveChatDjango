@@ -4,6 +4,7 @@ from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
 
+from .models import User
 from .permissions import is_guest, logged_in
 from .serializers import UserSerializer, UserLoginSerializer, LoginSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -34,7 +35,7 @@ class TheAuthAPIView(ViewSet):
 
 
 class TheAuthRegisterView(ViewSet):
-    @swagger_auto_schema(responses=register_response)
+    @swagger_auto_schema(responses=register_response, request_body=UserSerializer)
     def register(self, request):
         if logged_in(request):
             return Response({'message': 'You are already logged in'}, 400)
@@ -47,7 +48,7 @@ class TheAuthRegisterView(ViewSet):
 
 
 class TheAuthLoginView(ViewSet):
-    @swagger_auto_schema(responses=login_response)
+    @swagger_auto_schema(responses=login_response, request_body=UserLoginSerializer)
     def login(self, request):
         if logged_in(request):
             return Response({'message': 'You are already logged in'}, 400)
