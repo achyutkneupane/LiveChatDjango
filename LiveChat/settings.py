@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     "django.contrib.admin",
     "rest_framework",
     "drf_yasg",
-    "the_auth"
+    "the_auth",
+    "chatbox"
 ]
 
 MIDDLEWARE = [
