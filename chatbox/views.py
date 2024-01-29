@@ -26,6 +26,27 @@ class ChatboxListView(APIView):
         serializer = ChatboxSerializer(chatboxes, many=True)
         return Response({'message': 'Chatboxes retrieved successfully', 'data': serializer.data, 'status': 200}, 200)
 
+    @swagger_auto_schema(
+        responses={
+            400: error_response[400],
+            200: openapi.Response('Chatbox created successfully', openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'message': openapi.Schema(type=openapi.TYPE_STRING),
+                    'status': openapi.Schema(type=openapi.TYPE_INTEGER),
+                    'data': Chatbox.schema()
+                }
+            ))
+        },
+        request_body=ChatboxSerializer
+    )
+    def post(self, request):
+        serializer = ChatboxSerializer(data=request.data)
+        if not serializer.is_valid(raise_exception=True):
+            return Response({'message': 'Invalid Data', 'status': 400}, 400)
+        serializer.save()
+        return Response({'message': 'Chatbox created successfully', 'data': serializer.data, 'status': 200}, 200)
+
 
 class ChatBoxView(APIView):
     @swagger_auto_schema(
