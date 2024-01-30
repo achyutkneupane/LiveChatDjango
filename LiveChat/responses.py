@@ -21,7 +21,6 @@ login_response = {
         properties={
             'message': openapi.Schema(type=openapi.TYPE_STRING),
             'data': {
-                'refresh': openapi.Schema(type=openapi.TYPE_STRING),
                 'access': openapi.Schema(type=openapi.TYPE_STRING)
             },
             'status': openapi.Schema(type=openapi.TYPE_INTEGER)
@@ -30,7 +29,6 @@ login_response = {
         'application/json': {
             'message': 'User Logged In Successfully',
             'data': {
-                'refresh': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9',
                 'access': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9'
             },
             'status': 200

@@ -20,7 +20,8 @@ class ChatboxListView(APIView):
                     'data': openapi.Schema(type=openapi.TYPE_ARRAY, items=Chatbox.schema())
                 }
             ))
-        }
+        },
+        security=[{'Bearer': []}]
     )
     def get(self, request):
         if not logged_in(request):
