@@ -37,6 +37,39 @@ class RegistrationTestCase(TestCase):
             "password": self.user1_data['password']
         }
 
+    def create_chatbox(self, participants, token):
+        response = self.client.post('/api/chatbox/',
+                                    {
+                                        "participants": participants
+                                    },
+                                    headers={
+                                        'Authorization': f'Bearer {token}'
+                                    })
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['message'], 'Chatbox created successfully')
+        self.assertEqual(response.data['status'], 200)
+        return response
+
+    def get_chatboxes(self, token):
+        response = self.client.get('/api/chatbox/',
+                                    headers={
+                                        'Authorization': f'Bearer {token}'
+                                    })
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['message'], 'Chatboxes retrieved successfully')
+        self.assertEqual(response.data['status'], 200)
+        return response
+
+    def get_chatbox(self, chatbox_id, token):
+        response = self.client.get(f'/api/chatbox/{chatbox_id}',
+                                    headers={
+                                        'Authorization': f'Bearer {token}'
+                                    })
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['message'], 'Chatbox fetched successfully')
+        self.assertEqual(response.data['status'], 200)
+        return response
+
     def test_chatbox_can_be_fetched(self):
         response1 = self.client.post('/api/auth/register', self.user1_data, format='json')
         self.assertEqual(response1.status_code, 200)
@@ -168,4 +201,3 @@ class RegistrationTestCase(TestCase):
         self.assertEqual(response7.data['data']['participants'][0], user3_id)
         self.assertEqual(response7.data['data']['participants'][1], user2_id)
         self.assertEqual(response7.data['data']['participants'][2], user1_id)
-
