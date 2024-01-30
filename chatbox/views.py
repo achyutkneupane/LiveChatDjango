@@ -98,6 +98,7 @@ class SendMessageView(APIView):
                 }
             })
         },
+        request_body={'type': openapi.TYPE_OBJECT, 'properties': {'content': openapi.Schema(type=openapi.TYPE_STRING)}},
         security=[{'Bearer': []}]
     )
     def post(self, request, pk):

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Chatbox
+from .models import Chatbox, Message
 
 
 class ChatboxSerializer(serializers.ModelSerializer):
@@ -20,3 +20,28 @@ class ChatboxSerializer(serializers.ModelSerializer):
         chatbox.participants.set(participants_with_user_id)
 
         return chatbox
+
+
+class ChatboxMessageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Message
+        fields = '__all__'
+
+    def create(self, validated_data):
+        request = self.context['request']
+        sender = request.user
+        content = validated_data.get('content')
+        chatbox = validated_data.get('chatBox')
+        reply_to = validated_data.get('replyTo', None)
+        is_forwarded = validated_data.get('isForwarded', False)
+
+        message = Message.objects.create(
+            sender=sender,
+            content=content,
+            chatBox=chatbox,
+            replyTo=reply_to,
+            isForwarded=is_forwarded
+        )
+
+        return message
