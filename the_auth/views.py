@@ -7,6 +7,7 @@ from .serializers import UserSerializer, UserLoginSerializer, LoginSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from drf_yasg.utils import swagger_auto_schema
 from LiveChat.responses import login_response, error_response, register_response
+from the_auth.models import User
 
 
 class TheAuthAPIView(ViewSet):
@@ -75,3 +76,32 @@ class TheAuthLoginView(ViewSet):
             },
             'status': 200
         }, 200)
+
+
+class CurrentUserView(ViewSet):
+    @swagger_auto_schema(
+        responses={
+            400: error_response[400],
+            200: openapi.Response('User fetched successfully', openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'message': openapi.Schema(type=openapi.TYPE_STRING),
+                    'status': openapi.Schema(type=openapi.TYPE_INTEGER),
+                    'data': {}
+                }
+            ), examples={
+                'application/json': {
+                    'message': 'User fetched successfully',
+                    'status': 200,
+                    'data': {}
+                }
+            })
+        },
+        security=[{'Bearer': []}]
+    )
+    def get_user(self, request):
+        if not logged_in(request):
+            return Response({'message': 'User not logged in', 'status': 400}, 400)
+        user = User.objects.get(pk=request.user.id)
+        serializer = UserSerializer(user)
+        return Response({'message': 'User fetched successfully', 'data': serializer.data, 'status': 200}, 200)
