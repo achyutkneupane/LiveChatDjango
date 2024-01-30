@@ -43,15 +43,17 @@ class RegistrationTestCase(TestCase):
         response1 = self.client.post('/api/auth/register', self.user1_data, format='json')
         self.assertEqual(response1.status_code, 200)
         self.assertEqual(response1.data['message'], 'User Registered Successfully')
-        print(response1.data)
+        self.assertEqual(response1.data['status'], 200)
 
         response2 = self.client.post('/api/auth/register', self.user2_data, format='json')
         self.assertEqual(response2.status_code, 200)
         self.assertEqual(response2.data['message'], 'User Registered Successfully')
+        self.assertEqual(response2.data['status'], 200)
 
         response3 = self.client.post('/api/auth/login', self.user1_login_data, format='json')
         self.assertEqual(response3.status_code, 200)
         self.assertEqual(response3.data['message'], 'User Logged In Successfully')
+        self.assertEqual(response3.data['status'], 200)
 
         user1_id = response1.data['data']['id']
         user2_id = response2.data['data']['id']
@@ -62,3 +64,11 @@ class RegistrationTestCase(TestCase):
                                      })
         self.assertEqual(response4.status_code, 200)
         self.assertEqual(response4.data['message'], 'Chatbox created successfully')
+        self.assertEqual(response4.data['status'], 200)
+
+        response5 = self.client.get('/api/chatbox/')
+        self.assertEqual(response5.status_code, 200)
+        self.assertEqual(response5.data['message'], 'Chatboxes retrieved successfully')
+        self.assertEqual(response5.data['status'], 200)
+        self.assertEqual(len(response5.data['data']), 1)
+

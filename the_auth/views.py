@@ -27,32 +27,32 @@ class TheAuthAPIView(ViewSet):
     })
     def index(self, request):
         if not logged_in(request):
-            return Response({'message': 'You are not logged in'}, 401)
-        return Response({'message': 'This is the main page'}, 200)
+            return Response({'message': 'You are not logged in', 'status': 400}, 400)
+        return Response({'message': 'This is the main page', 'status': 200}, 200)
 
 
 class TheAuthRegisterView(ViewSet):
     @swagger_auto_schema(responses=register_response, request_body=UserSerializer)
     def register(self, request):
         if logged_in(request):
-            return Response({'message': 'You are already logged in'}, 400)
+            return Response({'message': 'You are already logged in', 'status': 400}, 400)
 
         serializer = UserSerializer(data=request.data)
         if not serializer.is_valid(raise_exception=True):
-            return Response({'message': 'Invalid Data'}, 400)
+            return Response({'message': 'Invalid Data', 'status': 400}, 400)
         serializer.save()
-        return Response({'message': 'User Registered Successfully'}, 200)
+        return Response({'message': 'User Registered Successfully', 'data': serializer.data, 'status': 200}, 200)
 
 
 class TheAuthLoginView(ViewSet):
     @swagger_auto_schema(responses=login_response, request_body=UserLoginSerializer)
     def login(self, request):
         if logged_in(request):
-            return Response({'message': 'You are already logged in'}, 400)
+            return Response({'message': 'You are already logged in', 'status': 400}, 400)
 
         serializer = UserLoginSerializer(data=request.data)
         if not serializer.is_valid(raise_exception=True):
-            return Response({'message': 'Invalid Data'}, 400)
+            return Response({'message': 'Invalid Data', 'status': 400}, 400)
 
         login_serializer_data = {
             'user': serializer.validated_data.id,
@@ -63,7 +63,7 @@ class TheAuthLoginView(ViewSet):
         login_serializer = LoginSerializer(data=login_serializer_data)
 
         if not login_serializer.is_valid(raise_exception=True):
-            return Response({'message': 'Invalid Data'}, 400)
+            return Response({'message': 'Invalid Data', 'status': 400}, 400)
 
         login_serializer.save()
 
@@ -73,5 +73,6 @@ class TheAuthLoginView(ViewSet):
             'data': {
                 'refresh': str(refresh_token),
                 'access': str(refresh_token.access_token)
-            }
+            },
+            'status': 200
         }, 200)
