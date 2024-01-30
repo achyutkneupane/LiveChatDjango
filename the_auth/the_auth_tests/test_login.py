@@ -1,7 +1,6 @@
 from django.test import TestCase
 from rest_framework.test import APIClient
 from the_auth.models import User
-import bcrypt
 
 
 class RegistrationTestCase(TestCase):
