@@ -3,7 +3,6 @@ from .models import Chatbox, Message
 
 
 class ChatboxSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Chatbox
         fields = '__all__'
@@ -22,26 +21,27 @@ class ChatboxSerializer(serializers.ModelSerializer):
         return chatbox
 
 
-class ChatboxMessageSerializer(serializers.ModelSerializer):
-
+class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
-        fields = '__all__'
+        fields = ['id', 'content', 'createdAt', 'updatedAt']
 
     def create(self, validated_data):
-        request = self.context['request']
-        sender = request.user
-        content = validated_data.get('content')
-        chatbox = validated_data.get('chatBox')
-        reply_to = validated_data.get('replyTo', None)
-        is_forwarded = validated_data.get('isForwarded', False)
+        try:
+            request = self.context['request']
+            content = validated_data.get('content')
+            chatbox = self.context['pk']
+            reply_to = validated_data.get('replyTo', None)
+            is_forwarded = validated_data.get('isForwarded', False)
 
-        message = Message.objects.create(
-            sender=sender,
-            content=content,
-            chatBox=chatbox,
-            replyTo=reply_to,
-            isForwarded=is_forwarded
-        )
+            message = Message.objects.create(
+                sender_id=request.user.id,
+                content=content,
+                chatBox_id=chatbox,
+                replyTo=reply_to,
+                isForwarded=is_forwarded
+            )
+        except Exception as e:
+            raise serializers.ValidationError({'message': e, 'status': 400}, 400)
 
         return message
