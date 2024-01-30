@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from drf_yasg.utils import swagger_auto_schema
 from LiveChat.responses import error_response
 from rest_framework.response import Response
-from .models import Chatbox
+from .models import Chatbox, Message
 from .serializers import ChatboxSerializer
 
 
@@ -69,3 +69,31 @@ class ChatBoxView(APIView):
             return Response({'message': 'Chatbox not found', 'status': 400}, 400)
         serializer = ChatboxSerializer(chatbox)
         return Response({'message': 'Chatbox fetched successfully', 'data': serializer.data, 'status': 200}, 200)
+
+
+class SendMessageView(APIView):
+    @swagger_auto_schema(
+        responses={
+            400: error_response[400],
+            200: openapi.Response('Message sent successfully', openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'message': openapi.Schema(type=openapi.TYPE_STRING),
+                    'status': openapi.Schema(type=openapi.TYPE_INTEGER)
+                }
+            ), examples={
+                'application/json': {
+                    'message': 'Message sent successfully',
+                    'status': 200
+                }
+            })
+        }
+    )
+    def post(self, request, pk):
+        try:
+            chatbox = Chatbox.objects.get(pk=pk)
+        except Chatbox.DoesNotExist:
+            return Response({'message': 'Chatbox not found', 'status': 400}, 400)
+        message = Message.objects.create(chatbox=chatbox, message=request.data['message'])
+        serializer = ChatboxSerializer(chatbox)
+        return Response({'message': 'Message sent successfully', 'status': 200}, 200)
