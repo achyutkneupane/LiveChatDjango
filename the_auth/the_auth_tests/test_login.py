@@ -3,7 +3,7 @@ from rest_framework.test import APIClient
 from the_auth.models import User
 
 
-class RegistrationTestCase(TestCase):
+class LoginTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.test_data = {
@@ -19,37 +19,35 @@ class RegistrationTestCase(TestCase):
             "password": self.test_data['password']
         }
 
-    def test_user_can_login(self):
-        response = self.client.post('/api/auth/register', self.test_data, format='json')
+    def register_user(self, user_data):
+        response = self.client.post('/api/auth/register', user_data, format='json')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(User.objects.count(), 1)
         self.assertEqual(response.data['message'], 'User Registered Successfully')
+        self.assertEqual(response.data['status'], 200)
+        return response
 
-        response = self.client.post('/api/auth/login', self.login_data, format='json')
+    def login_user(self, user_login_data):
+        response = self.client.post('/api/auth/login', user_login_data, format='json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['message'], 'User Logged In Successfully')
+        self.assertEqual(response.data['status'], 200)
+        return response
+
+    def test_user_can_login(self):
+        self.register_user(self.test_data)
+        self.login_user(self.login_data)
 
     def test_user_can_login_with_email(self):
         new_login_data = self.login_data.copy()
         new_login_data['login'] = self.test_data['email']
-
-        response = self.client.post('/api/auth/register', self.test_data, format='json')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(User.objects.count(), 1)
-        self.assertEqual(response.data['message'], 'User Registered Successfully')
-
-        response = self.client.post('/api/auth/login', new_login_data, format='json')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['message'], 'User Logged In Successfully')
+        self.register_user(self.test_data)
+        self.login_user(new_login_data)
 
     def test_user_cannot_login_with_invalid_login(self):
         new_login_data = self.login_data.copy()
         new_login_data['login'] = 'invalidlogin'
 
-        response = self.client.post('/api/auth/register', self.test_data, format='json')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(User.objects.count(), 1)
-        self.assertEqual(response.data['message'], 'User Registered Successfully')
+        self.register_user(self.test_data)
 
         response = self.client.post('/api/auth/login', new_login_data, format='json')
         self.assertEqual(response.status_code, 400)
@@ -59,10 +57,8 @@ class RegistrationTestCase(TestCase):
         new_login_data = self.login_data.copy()
         new_login_data['password'] = 'invalidpassword'
 
-        response = self.client.post('/api/auth/register', self.test_data, format='json')
-        self.assertEqual(response.status_code, 200)
+        self.register_user(self.test_data)
         self.assertEqual(User.objects.count(), 1)
-        self.assertEqual(response.data['message'], 'User Registered Successfully')
 
         response = self.client.post('/api/auth/login', new_login_data, format='json')
         self.assertEqual(response.status_code, 400)
@@ -73,10 +69,7 @@ class RegistrationTestCase(TestCase):
         new_login_data['login'] = ''
         new_login_data['password'] = ''
 
-        response = self.client.post('/api/auth/register', self.test_data, format='json')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(User.objects.count(), 1)
-        self.assertEqual(response.data['message'], 'User Registered Successfully')
+        self.register_user(self.test_data)
 
         response = self.client.post('/api/auth/login', new_login_data, format='json')
         self.assertEqual(response.status_code, 400)
@@ -88,10 +81,7 @@ class RegistrationTestCase(TestCase):
         del new_login_data['login']
         del new_login_data['password']
 
-        response = self.client.post('/api/auth/register', self.test_data, format='json')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(User.objects.count(), 1)
-        self.assertEqual(response.data['message'], 'User Registered Successfully')
+        self.register_user(self.test_data)
 
         response = self.client.post('/api/auth/login', new_login_data, format='json')
         self.assertEqual(response.status_code, 400)
@@ -103,10 +93,7 @@ class RegistrationTestCase(TestCase):
         new_login_data['login'] = 'invalidlogin'
         new_login_data['password'] = 'invalidpassword'
 
-        response = self.client.post('/api/auth/register', self.test_data, format='json')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(User.objects.count(), 1)
-        self.assertEqual(response.data['message'], 'User Registered Successfully')
+        self.register_user(self.test_data)
 
         response = self.client.post('/api/auth/login', new_login_data, format='json')
         self.assertEqual(response.status_code, 400)
