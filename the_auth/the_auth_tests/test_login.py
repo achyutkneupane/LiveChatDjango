@@ -3,7 +3,7 @@ from rest_framework.test import APIClient
 from the_auth.models import User
 
 
-class RegistrationTestCase(TestCase):
+class LoginTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.test_data = {
