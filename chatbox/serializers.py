@@ -9,20 +9,14 @@ class ChatboxSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def create(self, validated_data):
+        request = self.context['request']
+        user = request.user
         name = validated_data.get('name')
         participants = validated_data.get('participants')
+
+        participants_with_user_id = [user.id] + participants
 
         chatbox = Chatbox.objects.create(name=name)
-        chatbox.participants.set(participants)
+        chatbox.participants.set(participants_with_user_id)
 
         return chatbox
-
-    def update(self, instance, validated_data):
-        name = validated_data.get('name')
-        participants = validated_data.get('participants')
-
-        instance.name = name
-        instance.participants.set(participants)
-        instance.save()
-
-        return instance

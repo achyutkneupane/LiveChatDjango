@@ -46,7 +46,7 @@ class ChatboxListView(APIView):
     def post(self, request):
         if not logged_in(request):
             return Response({'message': 'User not logged in', 'status': 400}, 400)
-        serializer = ChatboxSerializer(data=request.data)
+        serializer = ChatboxSerializer(data=request.data, context={'request' : request})
         if not serializer.is_valid(raise_exception=True):
             return Response({'message': 'Invalid Data', 'status': 400}, 400)
         serializer.save()
