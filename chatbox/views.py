@@ -20,7 +20,8 @@ class ChatboxListView(APIView):
                     'data': openapi.Schema(type=openapi.TYPE_ARRAY, items=Chatbox.schema())
                 }
             ))
-        }
+        },
+        security=[{'Bearer': []}]
     )
     def get(self, request):
         if not logged_in(request):
@@ -41,7 +42,8 @@ class ChatboxListView(APIView):
                 }
             ))
         },
-        request_body=ChatboxSerializer
+        request_body=ChatboxSerializer,
+        security=[{'Bearer': []}]
     )
     def post(self, request):
         if not logged_in(request):
@@ -65,7 +67,8 @@ class ChatBoxView(APIView):
                     'data': Chatbox.schema()
                 }
             ))
-        }
+        },
+        security=[{'Bearer': []}]
     )
     def get(self, request, pk):
         if not logged_in(request):
@@ -94,7 +97,8 @@ class SendMessageView(APIView):
                     'status': 200
                 }
             })
-        }
+        },
+        security=[{'Bearer': []}]
     )
     def post(self, request, pk):
         if not logged_in(request):

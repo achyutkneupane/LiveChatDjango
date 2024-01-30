@@ -71,7 +71,6 @@ class TheAuthLoginView(ViewSet):
         return Response({
             'message': 'User Logged In Successfully',
             'data': {
-                'refresh': str(refresh_token),
                 'access': str(refresh_token.access_token)
             },
             'status': 200
