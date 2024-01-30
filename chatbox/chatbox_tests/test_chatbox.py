@@ -38,6 +38,11 @@ class ChatboxTestCase(TestCase):
             "password": self.user1_data['password']
         }
 
+        self.user2_login_data = {
+            "login": self.user2_data['username'],
+            "password": self.user2_data['password']
+        }
+
     login_user = LoginTestCase.login_user
     register_user = LoginTestCase.register_user
 
@@ -56,9 +61,9 @@ class ChatboxTestCase(TestCase):
 
     def get_chatboxes(self, token):
         response = self.client.get('/api/chatbox/',
-                                    headers={
-                                        'Authorization': f'Bearer {token}'
-                                    })
+                                   headers={
+                                       'Authorization': f'Bearer {token}'
+                                   })
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['message'], 'Chatboxes retrieved successfully')
         self.assertEqual(response.data['status'], 200)
@@ -66,11 +71,24 @@ class ChatboxTestCase(TestCase):
 
     def get_chatbox(self, chatbox_id, token):
         response = self.client.get(f'/api/chatbox/{chatbox_id}',
+                                   headers={
+                                       'Authorization': f'Bearer {token}'
+                                   })
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['message'], 'Chatbox fetched successfully')
+        self.assertEqual(response.data['status'], 200)
+        return response
+
+    def send_message(self, chatbox_id, content, token):
+        response = self.client.post(f'/api/chatbox/{chatbox_id}/message',
+                                    {
+                                        "content": content
+                                    },
                                     headers={
                                         'Authorization': f'Bearer {token}'
                                     })
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['message'], 'Chatbox fetched successfully')
+        self.assertEqual(response.data['message'], 'Message sent successfully')
         self.assertEqual(response.data['status'], 200)
         return response
 
@@ -82,7 +100,6 @@ class ChatboxTestCase(TestCase):
         self.assertEqual(response.data['data'], [])
 
     def test_chatbox_can_be_created(self):
-
         response1 = self.register_user(self.user1_data)
         response2 = self.register_user(self.user2_data)
         response3 = self.login_user(self.user1_login_data)
@@ -103,7 +120,6 @@ class ChatboxTestCase(TestCase):
         self.assertEqual(response6.data['data']['participants'][1], user1_id)
 
     def test_groupchat_can_be_created(self):
-
         response1 = self.register_user(self.user1_data)
         response2 = self.register_user(self.user2_data)
         response3 = self.register_user(self.user3_data)
@@ -125,3 +141,20 @@ class ChatboxTestCase(TestCase):
         self.assertEqual(response7.data['data']['participants'][0], user3_id)
         self.assertEqual(response7.data['data']['participants'][1], user2_id)
         self.assertEqual(response7.data['data']['participants'][2], user1_id)
+
+    def test_message_can_sent_in_private_chat(self):
+        self.register_user(self.user1_data)
+        response2 = self.register_user(self.user2_data)
+
+        response3 = self.login_user(self.user1_login_data)
+        response4 = self.login_user(self.user2_login_data)
+
+        user2_id = response2.data['data']['id']
+
+        user1_token = response3.data['data']['access']
+        user2_token = response4.data['data']['access']
+
+        response5 = self.create_chatbox([user2_id], user1_token)
+
+        self.send_message(response5.data["data"]["id"], "Hello from user1", user1_token)
+        self.send_message(response5.data["data"]["id"], "Hello from user2", user2_token)
