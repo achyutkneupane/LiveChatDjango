@@ -4,7 +4,7 @@ from drf_yasg.utils import swagger_auto_schema
 from LiveChat.responses import error_response
 from rest_framework.response import Response
 from .models import Chatbox, Message
-from .serializers import ChatboxSerializer
+from .serializers import ChatboxSerializer, MessageSerializer
 from the_auth.permissions import logged_in
 
 
@@ -48,7 +48,7 @@ class ChatboxListView(APIView):
     def post(self, request):
         if not logged_in(request):
             return Response({'message': 'User not logged in', 'status': 400}, 400)
-        serializer = ChatboxSerializer(data=request.data, context={'request' : request})
+        serializer = ChatboxSerializer(data=request.data, context={'request': request})
         if not serializer.is_valid(raise_exception=True):
             return Response({'message': 'Invalid Data', 'status': 400}, 400)
         serializer.save()
@@ -98,15 +98,18 @@ class SendMessageView(APIView):
                 }
             })
         },
+        request_body=MessageSerializer,
         security=[{'Bearer': []}]
     )
     def post(self, request, pk):
         if not logged_in(request):
             return Response({'message': 'User not logged in', 'status': 400}, 400)
         try:
-            chatbox = Chatbox.objects.get(pk=pk)
+            Chatbox.objects.get(pk=pk)
         except Chatbox.DoesNotExist:
             return Response({'message': 'Chatbox not found', 'status': 400}, 400)
-        message = Message.objects.create(chatbox=chatbox, message=request.data['message'])
-        serializer = ChatboxSerializer(chatbox)
+        message_serializer = MessageSerializer(data=request.data, context={'request': request, 'pk': pk})
+        if not message_serializer.is_valid(raise_exception=True):
+            return Response({'message': 'Invalid Data', 'status': 400}, 400)
+        message_serializer.save()
         return Response({'message': 'Message sent successfully', 'status': 200}, 200)
