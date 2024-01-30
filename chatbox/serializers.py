@@ -8,10 +8,13 @@ class ChatboxSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def create(self, validated_data):
-        request = self.context['request']
-        user = request.user
-        name = validated_data.get('name')
-        participants = validated_data.get('participants')
+        try:
+            request = self.context['request']
+            user = request.user
+            name = validated_data.get('name')
+            participants = validated_data.get('participants')
+        except Exception as e:
+            raise serializers.ValidationError({'message': e, 'status': 400}, 400)
 
         participants_with_user_id = [user.id] + participants
 
