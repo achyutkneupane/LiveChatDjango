@@ -5,6 +5,7 @@ from LiveChat.responses import error_response
 from rest_framework.response import Response
 from .models import Chatbox, Message
 from .serializers import ChatboxSerializer
+from the_auth.permissions import logged_in
 
 
 class ChatboxListView(APIView):
@@ -22,6 +23,8 @@ class ChatboxListView(APIView):
         }
     )
     def get(self, request):
+        if not logged_in(request):
+            return Response({'message': 'User not logged in', 'status': 400}, 400)
         chatboxes = Chatbox.objects.all()
         serializer = ChatboxSerializer(chatboxes, many=True)
         return Response({'message': 'Chatboxes retrieved successfully', 'data': serializer.data, 'status': 200}, 200)
@@ -41,6 +44,8 @@ class ChatboxListView(APIView):
         request_body=ChatboxSerializer
     )
     def post(self, request):
+        if not logged_in(request):
+            return Response({'message': 'User not logged in', 'status': 400}, 400)
         serializer = ChatboxSerializer(data=request.data)
         if not serializer.is_valid(raise_exception=True):
             return Response({'message': 'Invalid Data', 'status': 400}, 400)
@@ -63,6 +68,8 @@ class ChatBoxView(APIView):
         }
     )
     def get(self, request, pk):
+        if not logged_in(request):
+            return Response({'message': 'User not logged in', 'status': 400}, 400)
         try:
             chatbox = Chatbox.objects.get(pk=pk)
         except Chatbox.DoesNotExist:
@@ -90,6 +97,8 @@ class SendMessageView(APIView):
         }
     )
     def post(self, request, pk):
+        if not logged_in(request):
+            return Response({'message': 'User not logged in', 'status': 400}, 400)
         try:
             chatbox = Chatbox.objects.get(pk=pk)
         except Chatbox.DoesNotExist:
