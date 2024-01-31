@@ -26,14 +26,18 @@ class ChatboxSerializer(serializers.ModelSerializer):
         return last_message.sender_id == self.context['request'].user.id if last_message else None
 
     def get_isUnread(self, obj):
+        # last_message = Message.objects.filter(chatBox_id=obj.id).order_by('-createdAt').first()
+        # return last_message.readAt is None if last_message else False
+
+        # add case that the sender is not the current user
         last_message = Message.objects.filter(chatBox_id=obj.id).order_by('-createdAt').first()
-        return last_message.readAt is None if last_message else False
+        return last_message.readAt is None and last_message.sender_id != self.context['request'].user.id if last_message else False
 
     def create(self, validated_data):
         try:
             request = self.context['request']
             user = request.user
-            name = validated_data.get('name')
+            name = validated_data.get('name') or f'{user.username}'
             participants = validated_data.get('participants')
         except Exception as e:
             raise serializers.ValidationError({'message': e, 'status': 400}, 400)

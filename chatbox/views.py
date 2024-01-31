@@ -4,8 +4,10 @@ from drf_yasg.utils import swagger_auto_schema
 from LiveChat.responses import error_response
 from rest_framework.response import Response
 from .models import Chatbox, Message
+from the_auth.models import User
 from .serializers import ChatboxSerializer, MessageSerializer
 from the_auth.permissions import logged_in
+import datetime
 
 
 class ChatboxListView(APIView):
@@ -28,6 +30,16 @@ class ChatboxListView(APIView):
             return Response({'message': 'User not logged in', 'status': 400}, 400)
         chatboxes = Chatbox.objects.all()
         serializer = ChatboxSerializer(chatboxes, many=True, context={'request': request})
+        # update name
+        for chatbox in serializer.data:
+            participants = chatbox['participants']
+            except_me = []
+            for participant in participants:
+                if participant != request.user.id:
+                    except_me.append(participant)
+            chatbox['name'] = chatbox['name'] or ', '.join(
+                User.objects.filter(id__in=except_me).values_list('username', flat=True)
+            ) or 'achyut'
         return Response({'message': 'Chatboxes retrieved successfully', 'data': serializer.data, 'status': 200}, 200)
 
     @swagger_auto_schema(
@@ -79,8 +91,14 @@ class ChatBoxView(APIView):
             return Response({'message': 'Chatbox not found', 'status': 400}, 400)
         serializer = ChatboxSerializer(chatbox, context={'request': request})
         messages = Message.objects.filter(chatBox_id=pk)
+
+        unread_messages = messages.filter(readAt__isnull=True).exclude(sender_id=request.user.id)
+        now_with_tz = datetime.datetime.now(datetime.timezone.utc)
+        unread_messages.update(readAt=now_with_tz)
+
         return_data = serializer.data
         return_data['messages'] = MessageSerializer(messages, many=True, context={'request': request}).data
+        return_data['name'] = chatbox.name or "achyut"
         return Response({'message': 'Chatbox fetched successfully', 'data': return_data, 'status': 200}, 200)
 
 
