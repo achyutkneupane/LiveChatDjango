@@ -38,7 +38,7 @@ class ChatboxListView(APIView):
                     except_me.append(participant)
             chatbox['name'] = chatbox['name'] or ', '.join(
                 User.objects.filter(id__in=except_me).values_list('username', flat=True)
-            ) or 'achyut'
+            )
         return Response({'message': 'Chatboxes retrieved successfully', 'data': serializer.data, 'status': 200}, 200)
 
     @swagger_auto_schema(
@@ -63,7 +63,11 @@ class ChatboxListView(APIView):
         if not serializer.is_valid(raise_exception=True):
             return Response({'message': 'Invalid Data', 'status': 400}, 400)
         serializer.save()
-        return Response({'message': 'Chatbox created successfully', 'data': serializer.data, 'status': 200}, 200)
+        return_data = serializer.data.copy()
+        return_data['name'] = return_data['name'] or ", ".join(
+            User.objects.filter(id__in=request.data['participants']).values_list('username', flat=True)
+        )
+        return Response({'message': 'Chatbox created successfully', 'data': return_data, 'status': 200}, 200)
 
 
 class ChatBoxView(APIView):

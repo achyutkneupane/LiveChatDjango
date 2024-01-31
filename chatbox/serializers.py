@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from .models import Chatbox, Message
+from the_auth.models import User
+from django.db.models import Q
 
 
 class ChatboxSerializer(serializers.ModelSerializer):
@@ -33,12 +35,21 @@ class ChatboxSerializer(serializers.ModelSerializer):
         try:
             request = self.context['request']
             user = request.user
-            name = validated_data.get('name') or f'{user.username}'
+            name = validated_data.get('name')
             participants = validated_data.get('participants')
         except Exception as e:
             raise serializers.ValidationError({'message': e, 'status': 400}, 400)
 
         participants_with_user_id = [user.id] + participants
+
+        query = Q(participants__exact=participants_with_user_id[0], name__isnull=True)
+        for participant_id in participants_with_user_id[1:]:
+            query |= Q(participants__exact=participant_id, name__isnull=True)
+
+        chatbox_with_same_participants = Chatbox.objects.filter(query).distinct()
+        if chatbox_with_same_participants:
+            return_value = chatbox_with_same_participants.first()
+            return return_value
 
         chatbox = Chatbox.objects.create(name=name)
         chatbox.participants.set(participants_with_user_id)
