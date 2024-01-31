@@ -3,9 +3,31 @@ from .models import Chatbox, Message
 
 
 class ChatboxSerializer(serializers.ModelSerializer):
+
+    lastMessage = serializers.SerializerMethodField()
+    lastMessageTime = serializers.SerializerMethodField()
+    iAmLastSender = serializers.SerializerMethodField()
+    isUnread = serializers.SerializerMethodField()
+
     class Meta:
         model = Chatbox
         fields = '__all__'
+
+    def get_lastMessage(self, obj):
+        last_message = Message.objects.filter(chatBox_id=obj.id).order_by('-createdAt').first()
+        return last_message.content if last_message else None
+
+    def get_lastMessageTime(self, obj):
+        last_message = Message.objects.filter(chatBox_id=obj.id).order_by('-createdAt').first()
+        return last_message.createdAt if last_message else None
+
+    def get_iAmLastSender(self, obj):
+        last_message = Message.objects.filter(chatBox_id=obj.id).order_by('-createdAt').first()
+        return last_message.sender_id == self.context['request'].user.id if last_message else None
+
+    def get_isUnread(self, obj):
+        last_message = Message.objects.filter(chatBox_id=obj.id).order_by('-createdAt').first()
+        return last_message.readAt is None if last_message else False
 
     def create(self, validated_data):
         try:

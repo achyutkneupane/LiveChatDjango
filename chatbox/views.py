@@ -27,7 +27,7 @@ class ChatboxListView(APIView):
         if not logged_in(request):
             return Response({'message': 'User not logged in', 'status': 400}, 400)
         chatboxes = Chatbox.objects.all()
-        serializer = ChatboxSerializer(chatboxes, many=True)
+        serializer = ChatboxSerializer(chatboxes, many=True, context={'request': request})
         return Response({'message': 'Chatboxes retrieved successfully', 'data': serializer.data, 'status': 200}, 200)
 
     @swagger_auto_schema(
