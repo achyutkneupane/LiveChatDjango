@@ -30,7 +30,6 @@ class ChatboxListView(APIView):
             return Response({'message': 'User not logged in', 'status': 400}, 400)
         chatboxes = Chatbox.objects.all()
         serializer = ChatboxSerializer(chatboxes, many=True, context={'request': request})
-        # update name
         for chatbox in serializer.data:
             participants = chatbox['participants']
             except_me = []

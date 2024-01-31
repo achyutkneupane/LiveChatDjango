@@ -26,10 +26,6 @@ class ChatboxSerializer(serializers.ModelSerializer):
         return last_message.sender_id == self.context['request'].user.id if last_message else None
 
     def get_isUnread(self, obj):
-        # last_message = Message.objects.filter(chatBox_id=obj.id).order_by('-createdAt').first()
-        # return last_message.readAt is None if last_message else False
-
-        # add case that the sender is not the current user
         last_message = Message.objects.filter(chatBox_id=obj.id).order_by('-createdAt').first()
         return last_message.readAt is None and last_message.sender_id != self.context['request'].user.id if last_message else False
 
