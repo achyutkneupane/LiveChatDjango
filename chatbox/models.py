@@ -43,6 +43,7 @@ class Message(models.Model):
     chatBox = models.ForeignKey(Chatbox, on_delete=models.CASCADE)
     replyTo = models.ForeignKey('self', on_delete=models.CASCADE, null=True)
     isForwarded = models.BooleanField(default=False)
+    readAt = models.DateTimeField(blank=True, null=True)
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
 
@@ -60,6 +61,7 @@ class Message(models.Model):
                 'chatBox': openapi.Schema(type=openapi.TYPE_INTEGER),
                 'replyTo': openapi.Schema(type=openapi.TYPE_INTEGER),
                 'isForwarded': openapi.Schema(type=openapi.TYPE_BOOLEAN),
+                'readAt': openapi.Schema(type=openapi.TYPE_STRING),
                 'createdAt': openapi.Schema(type=openapi.TYPE_STRING),
                 'updatedAt': openapi.Schema(type=openapi.TYPE_STRING)
             }

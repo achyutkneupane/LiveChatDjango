@@ -105,3 +105,32 @@ class CurrentUserView(ViewSet):
         user = User.objects.get(pk=request.user.id)
         serializer = UserSerializer(user)
         return Response({'message': 'User fetched successfully', 'data': serializer.data, 'status': 200}, 200)
+
+
+class AllUsersView(ViewSet):
+    @swagger_auto_schema(
+        responses={
+            400: error_response[400],
+            200: openapi.Response('All users fetched successfully', openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'message': openapi.Schema(type=openapi.TYPE_STRING),
+                    'status': openapi.Schema(type=openapi.TYPE_INTEGER),
+                    'data': {}
+                }
+            ), examples={
+                'application/json': {
+                    'message': 'All users fetched successfully',
+                    'status': 200,
+                    'data': {}
+                }
+            })
+        },
+        security=[{'Bearer': []}]
+    )
+    def get_all_users(self, request):
+        if not logged_in(request):
+            return Response({'message': 'User not logged in', 'status': 400}, 400)
+        users = User.objects.all().exclude(id=request.user.id)
+        serializer = UserSerializer(users, many=True)
+        return Response({'message': 'All users fetched successfully', 'data': serializer.data, 'status': 200}, 200)
