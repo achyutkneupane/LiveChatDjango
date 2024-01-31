@@ -62,7 +62,7 @@ class LoginTestCase(TestCase):
 
         response = self.client.post('/api/auth/login', new_login_data, format='json')
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.data['password'], ['Invalid password'])
+        self.assertEqual(response.data['password'], ['Wrong Password'])
 
     def test_user_cannot_login_with_blank_values(self):
         new_login_data = self.login_data.copy()

@@ -50,6 +50,6 @@ class UserLoginSerializer(serializers.Serializer):
             raise serializers.ValidationError({'login': f'User with this {default_login} does not exist'})
 
         if not bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
-            raise serializers.ValidationError({'password': 'Invalid password'})
+            raise serializers.ValidationError({'password': 'Wrong Password'})
 
         return user
