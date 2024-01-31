@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     "django.contrib.admin",
     "rest_framework",
+    "corsheaders",
     "drf_yasg",
     "the_auth",
     "chatbox"
