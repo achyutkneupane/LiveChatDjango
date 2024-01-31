@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     "django.contrib.admin",
     "rest_framework",
+    "corsheaders",
     "drf_yasg",
     "the_auth",
     "chatbox"
@@ -49,6 +50,8 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -173,3 +176,9 @@ SWAGGER_SETTINGS = {
     'JSON_EDITOR': True,
     'PERSIST_AUTH': True,
 }
+
+# CORS Settings
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:5173',
+]

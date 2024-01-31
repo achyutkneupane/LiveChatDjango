@@ -5,6 +5,7 @@ charset-normalizer==3.3.2
 coreapi==2.3.3
 coreschema==0.0.4
 Django==5.0.1
+django-cors-headers==4.3.1
 django-filter==23.5
 django-stubs==4.2.7
 django-stubs-ext==4.2.7
