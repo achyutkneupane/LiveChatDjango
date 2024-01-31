@@ -47,9 +47,27 @@ class ChatboxSerializer(serializers.ModelSerializer):
 
 
 class MessageSerializer(serializers.ModelSerializer):
+
+    sender = serializers.SerializerMethodField()
+    senderName = serializers.SerializerMethodField()
+    chatBox = serializers.SerializerMethodField()
+    isMe = serializers.SerializerMethodField()
+
+    def get_sender(self, obj):
+        return obj.sender_id
+
+    def get_senderName(self, obj):
+        return obj.sender.username
+
+    def get_chatBox(self, obj):
+        return obj.chatBox_id
+
+    def get_isMe(self, obj):
+        return obj.sender_id == self.context['request'].user.id
+
     class Meta:
         model = Message
-        fields = ['id', 'content', 'createdAt', 'updatedAt']
+        fields = ['id', 'content', 'createdAt', 'updatedAt', 'sender', 'senderName', 'chatBox', 'replyTo', 'isForwarded', 'isMe']
 
     def create(self, validated_data):
         try:
