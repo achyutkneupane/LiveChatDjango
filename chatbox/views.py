@@ -77,8 +77,11 @@ class ChatBoxView(APIView):
             chatbox = Chatbox.objects.get(pk=pk)
         except Chatbox.DoesNotExist:
             return Response({'message': 'Chatbox not found', 'status': 400}, 400)
-        serializer = ChatboxSerializer(chatbox)
-        return Response({'message': 'Chatbox fetched successfully', 'data': serializer.data, 'status': 200}, 200)
+        serializer = ChatboxSerializer(chatbox, context={'request': request})
+        messages = Message.objects.filter(chatBox_id=pk)
+        return_data = serializer.data
+        return_data['messages'] = MessageSerializer(messages, many=True, context={'request': request}).data
+        return Response({'message': 'Chatbox fetched successfully', 'data': return_data, 'status': 200}, 200)
 
 
 class SendMessageView(APIView):
