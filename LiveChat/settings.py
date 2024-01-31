@@ -28,7 +28,7 @@ SECRET_KEY = "django-insecure-uaw-$c#j%v@at(n8bsjjv_^mqt))&^#s+wgb9sg@5%=ty&+gb6
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DJANGO_ENV') == 'local'
 
-ALLOWED_HOSTS = ["127.0.0.1"]
+ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 
 # Application definition
 
@@ -41,13 +41,17 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     "django.contrib.admin",
     "rest_framework",
+    "corsheaders",
     "drf_yasg",
-    "the_auth"
+    "the_auth",
+    "chatbox"
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -146,14 +150,14 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTStatelessUserAuthentication'
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
-    "PAGE_SIZE": 10
+    "PAGE_SIZE": 10,
+    "TOKEN_USER_CLASS": "the_auth.models.User",
 }
 
 # Simple JWT Settings
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=20),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=3),
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=3),
 }
 
 # Swagger Settings
@@ -161,10 +165,20 @@ SIMPLE_JWT = {
 SWAGGER_SETTINGS = {
     "DEFAULT_MODEL_RENDERING": "example",
     'SECURITY_DEFINITIONS': {
-        'bearer': {
+        'Bearer': {
             'type': 'apiKey',
             'name': 'Authorization',
             'in': 'header'
         }
     },
+    'USE_SESSION_AUTH': False,
+    'SHOW_REQUEST_HEADERS': True,
+    'JSON_EDITOR': True,
+    'PERSIST_AUTH': True,
 }
+
+# CORS Settings
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:5173',
+]

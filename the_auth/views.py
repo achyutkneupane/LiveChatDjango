@@ -1,15 +1,13 @@
 from drf_yasg import openapi
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
 
-from .models import User
-from .permissions import is_guest, logged_in
+from .permissions import logged_in
 from .serializers import UserSerializer, UserLoginSerializer, LoginSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from drf_yasg.utils import swagger_auto_schema
-from .responses import login_response, permission_response, register_response
+from LiveChat.responses import login_response, error_response, register_response
+from the_auth.models import User
 
 
 class TheAuthAPIView(ViewSet):
@@ -26,36 +24,36 @@ class TheAuthAPIView(ViewSet):
                 'status': 200
             }
         }),
-        400: permission_response[400]
+        400: error_response[400]
     })
     def index(self, request):
         if not logged_in(request):
-            return Response({'message': 'You are not logged in'}, 401)
-        return Response({'message': 'This is the main page'}, 200)
+            return Response({'message': 'You are not logged in', 'status': 400}, 400)
+        return Response({'message': 'This is the main page', 'status': 200}, 200)
 
 
 class TheAuthRegisterView(ViewSet):
     @swagger_auto_schema(responses=register_response, request_body=UserSerializer)
     def register(self, request):
         if logged_in(request):
-            return Response({'message': 'You are already logged in'}, 400)
+            return Response({'message': 'You are already logged in', 'status': 400}, 400)
 
         serializer = UserSerializer(data=request.data)
         if not serializer.is_valid(raise_exception=True):
-            return Response({'message': 'Invalid Data'}, 400)
+            return Response({'message': 'Invalid Data', 'status': 400}, 400)
         serializer.save()
-        return Response({'message': 'User Registered Successfully'}, 200)
+        return Response({'message': 'User Registered Successfully', 'data': serializer.data, 'status': 200}, 200)
 
 
 class TheAuthLoginView(ViewSet):
     @swagger_auto_schema(responses=login_response, request_body=UserLoginSerializer)
     def login(self, request):
         if logged_in(request):
-            return Response({'message': 'You are already logged in'}, 400)
+            return Response({'message': 'You are already logged in', 'status': 400}, 400)
 
         serializer = UserLoginSerializer(data=request.data)
         if not serializer.is_valid(raise_exception=True):
-            return Response({'message': 'Invalid Data'}, 400)
+            return Response({'message': 'Invalid Data', 'status': 400}, 400)
 
         login_serializer_data = {
             'user': serializer.validated_data.id,
@@ -66,7 +64,7 @@ class TheAuthLoginView(ViewSet):
         login_serializer = LoginSerializer(data=login_serializer_data)
 
         if not login_serializer.is_valid(raise_exception=True):
-            return Response({'message': 'Invalid Data'}, 400)
+            return Response({'message': 'Invalid Data', 'status': 400}, 400)
 
         login_serializer.save()
 
@@ -74,7 +72,65 @@ class TheAuthLoginView(ViewSet):
         return Response({
             'message': 'User Logged In Successfully',
             'data': {
-                'refresh': str(refresh_token),
                 'access': str(refresh_token.access_token)
-            }
+            },
+            'status': 200
         }, 200)
+
+
+class CurrentUserView(ViewSet):
+    @swagger_auto_schema(
+        responses={
+            400: error_response[400],
+            200: openapi.Response('User fetched successfully', openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'message': openapi.Schema(type=openapi.TYPE_STRING),
+                    'status': openapi.Schema(type=openapi.TYPE_INTEGER),
+                    'data': {}
+                }
+            ), examples={
+                'application/json': {
+                    'message': 'User fetched successfully',
+                    'status': 200,
+                    'data': {}
+                }
+            })
+        },
+        security=[{'Bearer': []}]
+    )
+    def get_user(self, request):
+        if not logged_in(request):
+            return Response({'message': 'User not logged in', 'status': 400}, 400)
+        user = User.objects.get(pk=request.user.id)
+        serializer = UserSerializer(user)
+        return Response({'message': 'User fetched successfully', 'data': serializer.data, 'status': 200}, 200)
+
+
+class AllUsersView(ViewSet):
+    @swagger_auto_schema(
+        responses={
+            400: error_response[400],
+            200: openapi.Response('All users fetched successfully', openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'message': openapi.Schema(type=openapi.TYPE_STRING),
+                    'status': openapi.Schema(type=openapi.TYPE_INTEGER),
+                    'data': {}
+                }
+            ), examples={
+                'application/json': {
+                    'message': 'All users fetched successfully',
+                    'status': 200,
+                    'data': {}
+                }
+            })
+        },
+        security=[{'Bearer': []}]
+    )
+    def get_all_users(self, request):
+        if not logged_in(request):
+            return Response({'message': 'User not logged in', 'status': 400}, 400)
+        users = User.objects.all().exclude(id=request.user.id)
+        serializer = UserSerializer(users, many=True)
+        return Response({'message': 'All users fetched successfully', 'data': serializer.data, 'status': 200}, 200)

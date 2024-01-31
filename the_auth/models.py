@@ -2,6 +2,7 @@ from django.db import models
 
 
 class User(models.Model):
+    id = models.AutoField(primary_key=True)
     firstName = models.CharField(max_length=50)
     middleName = models.CharField(max_length=50, blank=True)
     lastName = models.CharField(max_length=50)
@@ -25,6 +26,7 @@ class User(models.Model):
 
 
 class Login(models.Model):
+    id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     userAgent = models.CharField(max_length=255)
     ipAddress = models.CharField(max_length=50)
